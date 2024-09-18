@@ -1,4 +1,6 @@
-﻿using Amazon.DynamoDBv2;
+﻿using Amazon;
+using Amazon.DynamoDBv2;
+using Amazon.Runtime;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,7 +33,8 @@ var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
         services.Configure<LogWatcherOptions>(context.Configuration.GetSection(nameof(LogWatcherOptions)));
-        
+
+        services.AddSingleton<IAmazonDynamoDB>(x => new AmazonDynamoDBClient(RegionEndpoint.EUWest2));
         services.AddSingleton<IDynamoDbService, DynamoDbService>();
         services.AddSingleton<LogWatcherFactory>();
         services.AddSingleton<App>();
