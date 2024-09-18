@@ -68,9 +68,6 @@ public class LogWatcherService(ILogger<LogWatcherService> logger, IDynamoDbServi
     private async Task ProcessUserFile(string partitionKey, string jsonContent)
     {
         var userStatus = JsonSerializer.Deserialize<UserStatus>(jsonContent, JsonSerializerOptions);
-        
-        logger.LogInformation($"User data: {userStatus}");
-        
         await dynamoDbService.SaveUserStatusAsync(partitionKey, userStatus);
     }
 }
