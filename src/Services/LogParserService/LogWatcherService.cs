@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using SoloHash.Worker.Models;
 using SoloHash.Worker.Models.Pool;
+using SoloHash.Worker.Models.User;
 using SoloHash.Worker.Services.DynamoDbService;
 
 namespace SoloHash.Worker.Services.LogParserService;

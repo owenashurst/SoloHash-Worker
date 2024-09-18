@@ -1,5 +1,6 @@
 ﻿using SoloHash.Worker.Models;
 using SoloHash.Worker.Models.Pool;
+using SoloHash.Worker.Models.User;
 
 namespace SoloHash.Worker.Services.DynamoDbService;
 
