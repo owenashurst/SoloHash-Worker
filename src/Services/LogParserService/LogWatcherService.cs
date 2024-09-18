@@ -1,36 +1,40 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using SoloHash.Worker.Models;
 using SoloHash.Worker.Models.Pool;
 using SoloHash.Worker.Models.User;
 using SoloHash.Worker.Services.DynamoDbService;
 
 namespace SoloHash.Worker.Services.LogParserService;
 
-public class LogWatcherService(ILogger<LogWatcherService> logger, IDynamoDbService dynamoDbService, string directoryPath, string filter) : ILogWatcherService
+public class LogWatcherService : ILogWatcherService
 {
-    private JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
+    private readonly ILogger<LogWatcherService> _logger;
+    private readonly IDynamoDbService _dynamoDbService;
+    
+    private readonly FileSystemWatcher _fileSystemWatcher;
+
+    public LogWatcherService(ILogger<LogWatcherService> logger, IDynamoDbService dynamoDbService, string directoryPath,
+        string filter)
+    {
+        _logger = logger;
+        _dynamoDbService = dynamoDbService;
+        
+        _fileSystemWatcher = new FileSystemWatcher();
+        _fileSystemWatcher.Path = directoryPath;
+        _fileSystemWatcher.Filter = filter;
+        _fileSystemWatcher.Created += (sender, e) => OnFileChanged(e.FullPath);
+        _fileSystemWatcher.Changed += (sender, e) => OnFileChanged(e.FullPath);
+        _fileSystemWatcher.EnableRaisingEvents = true;
+    }
+    
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
     
-    public void StartWatching()
-    {
-        var watcher = new FileSystemWatcher
-        {
-            Path = directoryPath,
-            Filter = filter,
-            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName
-        };
-
-        watcher.Created += (sender, e) => OnFileChanged(e.FullPath);
-        watcher.Changed += (sender, e) => OnFileChanged(e.FullPath);
-        watcher.EnableRaisingEvents = true;
-    }
-    
     private async void OnFileChanged(string filePath)
     {
-        logger.LogInformation("File changed with full path: {FilePath}", filePath);
+        _logger.LogInformation("File changed with full path: {FilePath}", filePath);
         
         try
         {
@@ -38,19 +42,19 @@ public class LogWatcherService(ILogger<LogWatcherService> logger, IDynamoDbServi
 
             if (filePath.Contains("pool.status"))
             {
-                logger.LogInformation("Parsing pool status...");
+                _logger.LogInformation("Parsing pool status...");
                 await ProcessPoolStatus(fileContent);
             }
             else
             {
-                logger.LogInformation("Parsing user status...");
+                _logger.LogInformation("Parsing user status...");
                 var filename = Path.GetFileName(filePath);
                 await ProcessUserFile(filename, fileContent);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error when reading or parsing file");
+            _logger.LogError(ex, "Error when reading or parsing file");
         }
     }
     
@@ -58,16 +62,16 @@ public class LogWatcherService(ILogger<LogWatcherService> logger, IDynamoDbServi
     {
         var lines = jsonContent.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
-        var runtimeStatus = JsonSerializer.Deserialize<PoolStatusRuntime>(lines[0], JsonSerializerOptions);
-        var hashrateStatus = JsonSerializer.Deserialize<PoolHashrate>(lines[1], JsonSerializerOptions);
-        var statisticsStatus = JsonSerializer.Deserialize<PoolStatistics>(lines[2], JsonSerializerOptions);
+        var runtimeStatus = JsonSerializer.Deserialize<PoolStatusRuntime>(lines[0], _jsonSerializerOptions);
+        var hashrateStatus = JsonSerializer.Deserialize<PoolHashrate>(lines[1], _jsonSerializerOptions);
+        var statisticsStatus = JsonSerializer.Deserialize<PoolStatistics>(lines[2], _jsonSerializerOptions);
         
-        await dynamoDbService.SavePoolStatusAsync(runtimeStatus, hashrateStatus, statisticsStatus);
+        await _dynamoDbService.SavePoolStatusAsync(runtimeStatus, hashrateStatus, statisticsStatus);
     }
 
     private async Task ProcessUserFile(string partitionKey, string jsonContent)
     {
-        var userStatus = JsonSerializer.Deserialize<UserStatus>(jsonContent, JsonSerializerOptions);
-        await dynamoDbService.SaveUserStatusAsync(partitionKey, userStatus);
+        var userStatus = JsonSerializer.Deserialize<UserStatus>(jsonContent, _jsonSerializerOptions);
+        await _dynamoDbService.SaveUserStatusAsync(partitionKey, userStatus);
     }
 }

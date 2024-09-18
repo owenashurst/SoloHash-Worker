@@ -2,5 +2,4 @@
 
 public interface ILogWatcherService
 {
-    void StartWatching();
 }

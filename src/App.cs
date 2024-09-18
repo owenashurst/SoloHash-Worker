@@ -15,8 +15,7 @@ public class App(ILogger<App> logger, LogWatcherFactory logWatcherFactory)
 
         foreach (var type in logWatcherTypes)
         {
-            var service = logWatcherFactory.Create(type);
-            service.StartWatching();
+            logWatcherFactory.Create(type);
             
             logger.LogInformation("Started watching directory for type '{Type}'", Enum.GetName(type));
         }
