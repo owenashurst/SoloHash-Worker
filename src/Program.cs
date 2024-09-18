@@ -34,7 +34,7 @@ var host = Host.CreateDefaultBuilder(args)
     {
         services.Configure<LogWatcherOptions>(context.Configuration.GetSection(nameof(LogWatcherOptions)));
 
-        services.AddSingleton<IAmazonDynamoDB>(x => new AmazonDynamoDBClient(RegionEndpoint.EUWest2));
+        services.AddScoped<IAmazonDynamoDB>(x => new AmazonDynamoDBClient(RegionEndpoint.EUWest2));
         services.AddSingleton<IDynamoDbService, DynamoDbService>();
         services.AddSingleton<LogWatcherFactory>();
         services.AddSingleton<App>();
