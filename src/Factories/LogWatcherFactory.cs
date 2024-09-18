@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SoloHash.Worker.Options;
 using SoloHash.Worker.Services.DynamoDbService;
 using SoloHash.Worker.Services.LogParserService;
 
 namespace SoloHash.Worker.Factories;
 
-public class LogWatcherFactory(ILogger<LogWatcherService> logger, IDynamoDbService dynamoDbService, LogWatcherOptions logWatcherOptions)
+public class LogWatcherFactory(ILogger<LogWatcherService> logger, IDynamoDbService dynamoDbService, IOptions<LogWatcherOptions> logWatcherOptions)
 {
     public ILogWatcherService Create(LogWatcherType type)
     {
@@ -14,13 +15,13 @@ public class LogWatcherFactory(ILogger<LogWatcherService> logger, IDynamoDbServi
             LogWatcherType.User => new LogWatcherService(
                 logger,
                 dynamoDbService,
-                logWatcherOptions.UserDirectoryPath,
-                logWatcherOptions.UserFilter),
+                logWatcherOptions.Value.UserDirectoryPath,
+                logWatcherOptions.Value.UserFilter),
             LogWatcherType.Pool => new LogWatcherService(
                 logger,
                 dynamoDbService,
-                logWatcherOptions.PoolDirectoryPath,
-                logWatcherOptions.PoolFilter),
+                logWatcherOptions.Value.PoolDirectoryPath,
+                logWatcherOptions.Value.PoolFilter),
             _ => throw new ArgumentException("Invalid LogWatcherType", nameof(type))
         };
     }
