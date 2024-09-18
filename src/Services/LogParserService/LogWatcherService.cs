@@ -22,6 +22,8 @@ public class LogWatcherService : ILogWatcherService
         _fileSystemWatcher = new FileSystemWatcher();
         _fileSystemWatcher.Path = directoryPath;
         _fileSystemWatcher.Filter = filter;
+        _fileSystemWatcher.NotifyFilter =
+            NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
         _fileSystemWatcher.Created += (sender, e) => OnFileChanged(e.FullPath);
         _fileSystemWatcher.Changed += (sender, e) => OnFileChanged(e.FullPath);
         _fileSystemWatcher.EnableRaisingEvents = true;
