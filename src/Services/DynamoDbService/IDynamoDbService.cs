@@ -9,10 +9,10 @@ public interface IDynamoDbService
     /// <summary>
     /// Saves the pool status to DynamoDB
     /// </summary>
-    /// <param name="runtimeStatus"><see cref="PoolStatusRuntime"/>The pool runtime status</param>
-    /// <param name="hashrateStatus"><see cref="PoolHashrate"/>The pool hashrate</param>
-    /// <param name="statisticsStatus"><see cref="PoolStatistics"/>The pool statistics</param>
-    Task SavePoolStatusAsync(PoolStatusRuntime? runtimeStatus, PoolHashrate? hashrateStatus, PoolStatistics? statisticsStatus);
+    /// <param name="poolStatusRuntime"><see cref="PoolStatusRuntime"/>The pool runtime status</param>
+    /// <param name="poolHashrate"><see cref="PoolHashrate"/>The pool hashrate</param>
+    /// <param name="poolStatistics"><see cref="PoolStatistics"/>The pool statistics</param>
+    Task SavePoolStatusAsync(PoolStatusRuntime? poolStatusRuntime, PoolHashrate? poolHashrate, PoolStatistics? poolStatistics);
 
     /// <summary>
     /// Saves a user statistics to DynamoDB

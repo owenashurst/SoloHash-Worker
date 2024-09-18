@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
 using Microsoft.Extensions.Logging;
@@ -11,38 +12,23 @@ namespace SoloHash.Worker.Services.DynamoDbService;
 
 public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dynamoDbClient) : IDynamoDbService
 {
-    const string TableName = "SoloHashStats";
-    
-    public async Task SavePoolStatusAsync(PoolStatusRuntime? runtimeStatus, PoolHashrate? hashrateStatus,
-        PoolStatistics? statisticsStatus)
+    public async Task SavePoolStatusAsync(PoolStatusRuntime? poolStatusRuntime, PoolHashrate? poolHashrate,
+        PoolStatistics? poolStatistics)
     {
-        
-        const string partitionKey = "pool";
+        using DynamoDBContext context = new DynamoDBContext(dynamoDbClient);
 
-        // Create DynamoDB Document objects for each status
-        var runtimeStatusDocument = Document.FromJson(JsonSerializer.Serialize(runtimeStatus));
-        var hashrateStatusDocument = Document.FromJson(JsonSerializer.Serialize(hashrateStatus));
-        var statisticsStatusDocument = Document.FromJson(JsonSerializer.Serialize(statisticsStatus));
-
-        // Create item with documents as attributes
-        var item = new Dictionary<string, AttributeValue>
+        var poolStats = new PoolStats
         {
-            { "Id", new AttributeValue { S = partitionKey } },
-            { "StatsType", new AttributeValue { S = "pool" } },
-            { "RuntimeStatus", new AttributeValue { M = runtimeStatusDocument.ToAttributeMap() } },
-            { "HashrateStatus", new AttributeValue { M = hashrateStatusDocument.ToAttributeMap() } },
-            { "StatisticsStatus", new AttributeValue { M = statisticsStatusDocument.ToAttributeMap() } }
-        };
-
-        var request = new PutItemRequest
-        {
-            TableName = TableName,
-            Item = item
+            Id = "pool",
+            StatsType = "pool",
+            PoolStatusRuntime = poolStatusRuntime,
+            PoolHashrate = poolHashrate,
+            PoolStatistics = poolStatistics
         };
 
         try
         {
-            await dynamoDbClient.PutItemAsync(request);
+            await context.SaveAsync(poolStats);
             logger.LogInformation("Successfully saved pool status.");
         }
         catch (Exception ex)
@@ -53,22 +39,18 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
 
     public async Task SaveUserStatusAsync(string partitionKey, UserStatus? userStatus)
     {
-        var item = new Dictionary<string, AttributeValue>
-        {
-            { "Id", new AttributeValue { S = partitionKey } },
-            { "StatsType", new AttributeValue { S = "user" } },
-            { "UserStatus", new AttributeValue { S = JsonSerializer.Serialize(userStatus) } }
-        };
+        using DynamoDBContext context = new DynamoDBContext(dynamoDbClient);
 
-        var request = new PutItemRequest
+        var userStats = new UserStats
         {
-            TableName = TableName,
-            Item = item
+            Id = partitionKey,
+            StatsType = "user",
+            UserStatus = userStatus
         };
 
         try
         {
-            await dynamoDbClient.PutItemAsync(request);
+            await context.SaveAsync(userStats);
             logger.LogInformation("Successfully saved user status.");
         }
         catch (Exception ex)
