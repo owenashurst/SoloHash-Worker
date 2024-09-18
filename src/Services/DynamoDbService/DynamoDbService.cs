@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
 using Microsoft.Extensions.Logging;
 using SoloHash.Worker.Models;
@@ -18,13 +19,19 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
         
         const string partitionKey = "pool";
 
+        // Create DynamoDB Document objects for each status
+        var runtimeStatusDocument = Document.FromJson(JsonSerializer.Serialize(runtimeStatus));
+        var hashrateStatusDocument = Document.FromJson(JsonSerializer.Serialize(hashrateStatus));
+        var statisticsStatusDocument = Document.FromJson(JsonSerializer.Serialize(statisticsStatus));
+
+        // Create item with documents as attributes
         var item = new Dictionary<string, AttributeValue>
         {
             { "Id", new AttributeValue { S = partitionKey } },
             { "StatsType", new AttributeValue { S = "pool" } },
-            { "RuntimeStatus", new AttributeValue { S = JsonSerializer.Serialize(runtimeStatus) } },
-            { "HashrateStatus", new AttributeValue { S = JsonSerializer.Serialize(hashrateStatus) } },
-            { "StatisticsStatus", new AttributeValue { S = JsonSerializer.Serialize(statisticsStatus) } }
+            { "RuntimeStatus", new AttributeValue { M = runtimeStatusDocument.ToAttributeMap() } },
+            { "HashrateStatus", new AttributeValue { M = hashrateStatusDocument.ToAttributeMap() } },
+            { "StatisticsStatus", new AttributeValue { M = statisticsStatusDocument.ToAttributeMap() } }
         };
 
         var request = new PutItemRequest
