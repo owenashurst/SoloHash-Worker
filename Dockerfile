@@ -1,21 +1,15 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
-USER $APP_UID
+﻿# Build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 as build
 WORKDIR /app
+COPY . ./
+RUN dotnet restore
+RUN dotnet build
+RUN dotnet publish --configuration Release -o build
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["src/SoloHash-Worker.csproj", "SoloHash-Worker/"]
-RUN dotnet restore "src/SoloHash-Worker.csproj"
-COPY . .
-WORKDIR "/src/SoloHash-Worker"
-RUN dotnet build "SoloHash-Worker.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "SoloHash-Worker.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
+# Runtime
+FROM mcr.microsoft.com/dotnet/runtime:8.0
+ARG ENVIRONMENT
+ENV ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "SoloHash-Worker.dll"]
+COPY --from=build /app/build .
+ENTRYPOINT ["dotnet", "SoloHash.Worker.dll"]
