@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoloHash-Worker", "src\SoloHash-Worker.csproj", "{CC45769B-0C5C-4D01-87C4-DFB9DD769ACA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoloHash.Worker", "src\SoloHash.Worker.csproj", "{CC45769B-0C5C-4D01-87C4-DFB9DD769ACA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D04D5CBB-53B0-4E5E-AB75-BA7EB480F0A6}"
 	ProjectSection(SolutionItems) = preProject
