@@ -1,10 +1,10 @@
 ﻿using Amazon;
 using Amazon.DynamoDBv2;
-using Amazon.Runtime;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using SoloHash.Worker;
 using SoloHash.Worker.Factories;
 using SoloHash.Worker.Options;
@@ -17,11 +17,18 @@ var host = Host.CreateDefaultBuilder(args)
         logging.ClearProviders();
                 
         // Add Console and Debug logging
-        logging.AddConsole();
+        logging.AddConsole(options =>
+        {
+            // Add timestamp to the console log messages
+            options.FormatterName = "custom";
+        });
+        
         logging.AddDebug();
                 
         // Optional: Configure logging level
         logging.SetMinimumLevel(LogLevel.Information);
+        
+        logging.AddConsoleFormatter<CustomConsoleFormatter, ConsoleFormatterOptions>();
     })
     .ConfigureAppConfiguration((context, config) =>
     {
