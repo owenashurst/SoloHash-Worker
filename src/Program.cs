@@ -1,9 +1,11 @@
 ﻿using Amazon.DynamoDBv2;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SoloHash.Worker;
 using SoloHash.Worker.Factories;
+using SoloHash.Worker.Options;
 using SoloHash.Worker.Services.DynamoDbService;
 
 var host = Host.CreateDefaultBuilder(args)
@@ -19,8 +21,15 @@ var host = Host.CreateDefaultBuilder(args)
         // Optional: Configure logging level
         logging.SetMinimumLevel(LogLevel.Information);
     })
+    .ConfigureAppConfiguration((context, config) =>
+    {
+        config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+        config.AddEnvironmentVariables();
+    })
     .ConfigureServices((context, services) =>
     {
+        services.Configure<LogWatcherOptions>(context.Configuration.GetSection(nameof(LogWatcherOptions)));
+        
         services.AddSingleton<IAmazonDynamoDB>();
         services.AddSingleton<IDynamoDbService, DynamoDbService>();
         services.AddSingleton<LogWatcherFactory>();
