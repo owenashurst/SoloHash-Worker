@@ -8,6 +8,11 @@ namespace SoloHash.Worker.Services.LogParserService;
 
 public class LogWatcherService(ILogger<LogWatcherService> logger, IDynamoDbService dynamoDbService, string directoryPath, string filter) : ILogWatcherService
 {
+    private JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
+    
     public void StartWatching()
     {
         var watcher = new FileSystemWatcher
@@ -52,16 +57,16 @@ public class LogWatcherService(ILogger<LogWatcherService> logger, IDynamoDbServi
     {
         var lines = jsonContent.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
-        var runtimeStatus = JsonSerializer.Deserialize<PoolStatusRuntime>(lines[0]);
-        var hashrateStatus = JsonSerializer.Deserialize<PoolHashrate>(lines[1]);
-        var statisticsStatus = JsonSerializer.Deserialize<PoolStatistics>(lines[2]);
+        var runtimeStatus = JsonSerializer.Deserialize<PoolStatusRuntime>(lines[0], JsonSerializerOptions);
+        var hashrateStatus = JsonSerializer.Deserialize<PoolHashrate>(lines[1], JsonSerializerOptions);
+        var statisticsStatus = JsonSerializer.Deserialize<PoolStatistics>(lines[2], JsonSerializerOptions);
         
         await dynamoDbService.SavePoolStatusAsync(runtimeStatus, hashrateStatus, statisticsStatus);
     }
 
     private async Task ProcessUserFile(string partitionKey, string jsonContent)
     {
-        var userStatus = JsonSerializer.Deserialize<UserStatus>(jsonContent);
+        var userStatus = JsonSerializer.Deserialize<UserStatus>(jsonContent, JsonSerializerOptions);
         
         logger.LogInformation($"User data: {userStatus}");
         
