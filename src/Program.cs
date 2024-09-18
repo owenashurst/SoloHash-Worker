@@ -23,14 +23,15 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureAppConfiguration((context, config) =>
     {
-        config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-        config.AddEnvironmentVariables();
+        config.SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+            .AddEnvironmentVariables();
     })
     .ConfigureServices((context, services) =>
     {
         services.Configure<LogWatcherOptions>(context.Configuration.GetSection(nameof(LogWatcherOptions)));
         
-        services.AddSingleton<IAmazonDynamoDB>();
         services.AddSingleton<IDynamoDbService, DynamoDbService>();
         services.AddSingleton<LogWatcherFactory>();
         services.AddSingleton<App>();
