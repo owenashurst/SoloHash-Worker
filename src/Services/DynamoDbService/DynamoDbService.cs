@@ -19,8 +19,8 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
 
         var item = new Dictionary<string, AttributeValue>
         {
-            { "PartitionKey", new AttributeValue { S = partitionKey } },
-            { "SortKey", new AttributeValue { S = "pool" } },
+            { "Id", new AttributeValue { S = partitionKey } },
+            { "StatsType", new AttributeValue { S = "pool" } },
             { "RuntimeStatus", new AttributeValue { S = JsonSerializer.Serialize(runtimeStatus) } },
             { "HashrateStatus", new AttributeValue { S = JsonSerializer.Serialize(hashrateStatus) } },
             { "StatisticsStatus", new AttributeValue { S = JsonSerializer.Serialize(statisticsStatus) } }
@@ -47,8 +47,8 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
     {
         var item = new Dictionary<string, AttributeValue>
         {
-            { "PartitionKey", new AttributeValue { S = partitionKey } },
-            { "SortKey", new AttributeValue { S = "user" } },
+            { "Id", new AttributeValue { S = partitionKey } },
+            { "StatsType", new AttributeValue { S = "user" } },
             { "UserStatus", new AttributeValue { S = JsonSerializer.Serialize(userStatus) } }
         };
 
