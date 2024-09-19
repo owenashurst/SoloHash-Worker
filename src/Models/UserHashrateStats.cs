@@ -3,8 +3,8 @@ using SoloHash.Worker.Models.User;
 
 namespace SoloHash.Worker.Models;
 
-[DynamoDBTable("SoloHashStats")]
-public class UserHashrateStats : Item
+[DynamoDBTable("SoloHashUserHashrateStats")]
+public class UserHashrateStats : HashrateItem
 {
     [DynamoDBProperty]
     public string Hashrate5m { get; set; }

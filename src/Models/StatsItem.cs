@@ -2,7 +2,7 @@
 
 namespace SoloHash.Worker.Models;
 
-public class Item
+public class StatsItem
 {
     [DynamoDBHashKey]
     public string Id { get; set; }

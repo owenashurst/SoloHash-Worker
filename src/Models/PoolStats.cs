@@ -4,7 +4,7 @@ using SoloHash.Worker.Models.Pool;
 namespace SoloHash.Worker.Models;
 
 [DynamoDBTable("SoloHashStats")]
-public class PoolStats : Item
+public class PoolStats : StatsItem
 {
     [DynamoDBProperty]
     public PoolStatusRuntime PoolStatusRuntime { get; set; }

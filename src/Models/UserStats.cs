@@ -4,7 +4,7 @@ using SoloHash.Worker.Models.User;
 namespace SoloHash.Worker.Models;
 
 [DynamoDBTable("SoloHashStats")]
-public class UserStats : Item
+public class UserStats : StatsItem
 {
     [DynamoDBProperty]
     public UserStatus UserStatus { get; set; }
