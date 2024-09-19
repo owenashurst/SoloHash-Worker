@@ -1,23 +1,28 @@
 ﻿using Microsoft.Extensions.Logging;
-using SoloHash.Worker.Factories;
+using Microsoft.Extensions.Options;
+using SoloHash.Worker.Options;
+using SoloHash.Worker.Services.DynamoDbService;
+using SoloHash.Worker.Services.LogParserService;
 
 namespace SoloHash.Worker;
 
-public class App(ILogger<App> logger, LogWatcherFactory logWatcherFactory)
+public class App(ILogger<App> logger, ILogger<LogWatcherService> loggerWatcherService, IDynamoDbService dynamoDbService, IOptions<LogWatcherOptions> logWatcherOptions)
 {
+    private List<LogWatcherService> _logWatcherServices = [];
+    
     public void Run()
     {
-        var logWatcherTypes = new List<LogWatcherType> 
+        var directoriesToWatch = new List<(string path, string filter, LogWatcherType logWatcherType)>
         {
-            LogWatcherType.User,
-            LogWatcherType.Pool
+            (logWatcherOptions.Value.PoolDirectoryPath, logWatcherOptions.Value.PoolFilter, LogWatcherType.Pool),
+            (logWatcherOptions.Value.UserDirectoryPath, logWatcherOptions.Value.UserFilter, LogWatcherType.User)
         };
-
-        foreach (var type in logWatcherTypes)
+        
+        foreach (var (path, filter, logWatcherType) in directoriesToWatch)
         {
-            logWatcherFactory.Create(type);
-            
-            logger.LogInformation("Started watching directory for type '{Type}'", Enum.GetName(type));
+            var watcherService = new LogWatcherService(loggerWatcherService, dynamoDbService, path, filter);
+            _logWatcherServices.Add(watcherService);
+            logger.LogInformation("Started watching directory for type '{Type}'", Enum.GetName(logWatcherType));
         }
     }
 }

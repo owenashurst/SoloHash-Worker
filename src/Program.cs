@@ -6,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using SoloHash.Worker;
-using SoloHash.Worker.Factories;
 using SoloHash.Worker.Options;
 using SoloHash.Worker.Services.DynamoDbService;
 
@@ -43,7 +42,6 @@ var host = Host.CreateDefaultBuilder(args)
 
         services.AddScoped<IAmazonDynamoDB>(x => new AmazonDynamoDBClient(RegionEndpoint.EUWest2));
         services.AddSingleton<IDynamoDbService, DynamoDbService>();
-        services.AddSingleton<LogWatcherFactory>();
         services.AddSingleton<App>();
     })
     .Build();
