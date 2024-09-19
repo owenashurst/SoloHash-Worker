@@ -75,5 +75,6 @@ public class LogWatcherService : ILogWatcherService
     {
         var userStatus = JsonSerializer.Deserialize<UserStatus>(jsonContent, _jsonSerializerOptions);
         await _dynamoDbService.SaveUserStatusAsync(partitionKey, userStatus);
+        await _dynamoDbService.UpdateUserHashrateAsync(partitionKey, userStatus.Hashrate5m);
     }
 }

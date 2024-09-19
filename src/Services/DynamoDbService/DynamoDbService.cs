@@ -58,4 +58,26 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
             logger.LogError(ex, "Error saving user status.");
         }
     }
+    
+    public async Task UpdateUserHashrateAsync(string partitionKey, string hashrate5m)
+    {
+        using DynamoDBContext context = new DynamoDBContext(dynamoDbClient);
+
+        var userStats = new UserHashrateStats
+        {
+            Id = partitionKey,
+            StatsType = "hashrate",
+            Hashrate5m = hashrate5m
+        };
+
+        try
+        {
+            await context.SaveAsync(userStats);
+            logger.LogInformation("Successfully saved user hashrate stats.");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error saving user hashrate stats.");
+        }
+    }
 }
