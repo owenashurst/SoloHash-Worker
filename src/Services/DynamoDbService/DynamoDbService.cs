@@ -67,7 +67,8 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
         {
             Id = partitionKey,
             StatsType = "hashrate",
-            Hashrate5m = hashrate5m
+            Hashrate5m = hashrate5m,
+            ExpiryTime = SetExpiryTime(24)
         };
 
         try
@@ -79,5 +80,10 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
         {
             logger.LogError(ex, "Error saving user hashrate stats.");
         }
+    }
+    
+    private long SetExpiryTime(int hoursToLive)
+    {
+        return DateTimeOffset.UtcNow.AddHours(hoursToLive).ToUnixTimeSeconds();
     }
 }
