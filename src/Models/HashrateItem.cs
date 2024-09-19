@@ -6,4 +6,7 @@ public class HashrateItem
 {
     [DynamoDBHashKey]
     public string Id { get; set; }
+    
+    [DynamoDBRangeKey]
+    public DateTime EntryTime { get; set; }
 }

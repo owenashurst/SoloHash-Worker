@@ -10,8 +10,5 @@ public class UserHashrateStats : HashrateItem
     public string Hashrate5m { get; set; }
     
     [DynamoDBProperty] 
-    public DateTime EntryTime { get; set; }
-    
-    [DynamoDBProperty] 
-    public long ExpiryTime { get; set; }
+    public long ExpiryDate { get; set; }
 }
