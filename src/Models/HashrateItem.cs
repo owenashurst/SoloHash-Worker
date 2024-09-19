@@ -8,5 +8,5 @@ public class HashrateItem
     public string Id { get; set; }
     
     [DynamoDBRangeKey]
-    public DateTime EntryTime { get; set; }
+    public long EntryTime { get; set; }
 }

@@ -66,7 +66,7 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
         var userStats = new UserHashrateStats
         {
             Id = partitionKey,
-            EntryTime = DateTime.UtcNow,
+            EntryTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             Hashrate5m = hashrate5m,
             ExpiryDate = SetExpiryTime(24)
         };
