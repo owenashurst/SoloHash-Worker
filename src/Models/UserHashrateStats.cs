@@ -8,4 +8,12 @@ public class UserHashrateStats : Item
 {
     [DynamoDBProperty]
     public string Hashrate5m { get; set; }
+    
+    [DynamoDBProperty] 
+    public long ExpiryTime  => SetExpiryTime(24);
+    
+    private long SetExpiryTime(int hoursToLive)
+    {
+        return DateTimeOffset.UtcNow.AddHours(hoursToLive).ToUnixTimeSeconds();
+    }
 }
