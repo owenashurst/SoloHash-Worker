@@ -56,7 +56,7 @@ public class LogWatcherService : ILogWatcherService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error when reading or parsing file");
+            _logger.LogError(ex, "Error when reading or parsing file. Error: {ErrorMessage}", ex.Message);
         }
     }
     

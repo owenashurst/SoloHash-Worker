@@ -5,7 +5,7 @@ namespace SoloHash.Worker.Models.Pool;
 
 public class PoolStatusRuntime
 {
-    public int Runtime { get; set; }
+    public long Runtime { get; set; }
     
     [JsonConverter(typeof(UnixTimestampConverter))]
     public DateTime LastUpdate { get; set; }
