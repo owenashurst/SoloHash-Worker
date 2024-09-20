@@ -33,7 +33,7 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error saving pool status.");
+            logger.LogError(ex, "Error saving pool status. Error: {ErrorMessage}", ex.Message);
         }
     }
 
@@ -55,7 +55,7 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error saving user status.");
+            logger.LogError(ex, "Error saving user status. Error: {ErrorMessage}", ex.Message);
         }
     }
     
@@ -78,7 +78,7 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error saving user hashrate stats.");
+            logger.LogError(ex, "Error saving user hashrate stats. Error: {ErrorMessage}", ex.Message);
         }
     }
     
