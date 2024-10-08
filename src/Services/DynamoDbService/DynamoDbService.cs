@@ -1,8 +1,5 @@
-﻿using System.Text.Json;
-using Amazon.DynamoDBv2;
+﻿using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
-using Amazon.DynamoDBv2.DocumentModel;
-using Amazon.DynamoDBv2.Model;
 using Microsoft.Extensions.Logging;
 using SoloHash.Worker.Models;
 using SoloHash.Worker.Models.Pool;
@@ -20,7 +17,7 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
         var poolStats = new PoolStats
         {
             Id = "pool",
-            StatsType = "pool",
+            StatsType = StatsType.Pool,
             PoolStatusRuntime = poolStatusRuntime,
             PoolHashrate = poolHashrate,
             PoolStatistics = poolStatistics
@@ -44,7 +41,7 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
         var userStats = new UserStats
         {
             Id = partitionKey,
-            StatsType = "user",
+            StatsType = StatsType.User,
             UserStatus = userStatus
         };
 
@@ -79,6 +76,35 @@ public class DynamoDbService(ILogger<DynamoDbService> logger, IAmazonDynamoDB dy
         catch (Exception ex)
         {
             logger.LogError(ex, "Error saving user hashrate stats. Error: {ErrorMessage}", ex.Message);
+        }
+    }
+    
+    public async Task UpdateUserBlocksAsync(string partitionKey, Block block)
+    {
+        using DynamoDBContext context = new DynamoDBContext(dynamoDbClient);
+        
+        UserBlockStats? userBlockStats = await context.LoadAsync<UserBlockStats?>(partitionKey, StatsType.UserBlock);
+        
+        if (userBlockStats is null)
+        {
+            userBlockStats = new UserBlockStats
+            {
+                Id = partitionKey,
+                StatsType = StatsType.UserBlock,
+                Blocks = new List<Block> { block }
+            };
+        }
+        
+        userBlockStats.Blocks.Add(block);
+
+        try
+        {
+            await context.SaveAsync(userBlockStats);
+            logger.LogInformation("Successfully saved user blocks stats.");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error when saving user block stats. Error: {ErrorMessage}", ex.Message);
         }
     }
     

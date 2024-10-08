@@ -27,4 +27,12 @@ public interface IDynamoDbService
     /// <param name="partitionKey">The bitcoin address, which is also the filename</param>
     /// <param name="hashrate5m">The users hashrate5m</param>
     Task UpdateUserHashrateAsync(string partitionKey, string hashrate5m);
+
+    /// <summary>
+    /// Saves the latest block found for a user to DynamoDB
+    /// </summary>
+    /// <param name="partitionKey">The bitcoin address</param>
+    /// <param name="block"><see cref="Block"/>The block object to save</param>
+    /// <returns></returns>
+    Task UpdateUserBlocksAsync(string partitionKey, Block block);
 }

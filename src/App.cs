@@ -15,14 +15,15 @@ public class App(ILogger<App> logger, ILogger<LogWatcherService> loggerWatcherSe
         var directoriesToWatch = new List<(string path, string filter, LogWatcherType logWatcherType)>
         {
             (logWatcherOptions.Value.PoolDirectoryPath, logWatcherOptions.Value.PoolFilter, LogWatcherType.Pool),
-            (logWatcherOptions.Value.UserDirectoryPath, logWatcherOptions.Value.UserFilter, LogWatcherType.User)
+            (logWatcherOptions.Value.UserDirectoryPath, logWatcherOptions.Value.UserFilter, LogWatcherType.User),
+            (logWatcherOptions.Value.PoolDirectoryPath, logWatcherOptions.Value.PoolSystemFilter, LogWatcherType.PoolSystem)
         };
         
         foreach (var (path, filter, logWatcherType) in directoriesToWatch)
         {
-            var watcherService = new LogWatcherService(loggerWatcherService, dynamoDbService, path, filter);
+            var watcherService = new LogWatcherService(loggerWatcherService, dynamoDbService, path, filter, logWatcherType);
             _logWatcherServices.Add(watcherService);
-            logger.LogInformation("Started watching directory for type '{Type}'", Enum.GetName(logWatcherType));
+            logger.LogInformation("Started watching directory '{FileDirectory}' for type '{Type}'", path, Enum.GetName(logWatcherType));
         }
     }
 }

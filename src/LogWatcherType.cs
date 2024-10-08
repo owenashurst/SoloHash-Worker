@@ -2,6 +2,7 @@
 
 public enum LogWatcherType
 {
-    User,
-    Pool
+    User, // User JSON stats.
+    Pool, // Pool JSON stats.
+    PoolSystem // None JSON log file.
 }
